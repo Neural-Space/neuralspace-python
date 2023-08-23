@@ -52,6 +52,7 @@ class VoiceAI:
         timeout=None,
         on_complete=None,
         on_complete_kwargs={},
+        poll_schedule=None,
     ):
         '''
         Transcribe an audio file
@@ -65,6 +66,9 @@ class VoiceAI:
             number_formatting=number_formatting,
             language_detect=language_detect,
             speaker_diarization=speaker_diarization,
+            on_complete=on_complete,
+            on_complete_kwargs=on_complete_kwargs,
+            poll_schedule=poll_schedule,
         )
         return result
 
@@ -103,15 +107,8 @@ class VoiceAI:
 
 
     def poll_and_call(self, job_id, on_complete=None, on_complete_kwargs={}, poll_schedule=None):
-        with open('/home/vik/log.txt', 'w') as fp:
-            fp.write(f'HERE: {job_id}\n')
-        print('start polling')
         result = self.poll_until_complete(job_id, poll_schedule=poll_schedule)
-        print('done polling')
-        print(result)
-        print('calling')
         on_complete(result, **on_complete_kwargs)
-        print('done')
 
 
     def poll_until_complete(self, job_id, poll_schedule=None):
@@ -120,9 +117,7 @@ class VoiceAI:
         i = 0
         result = None
         while True:
-            # print(f'poll {i}')
             result = self.get_job_status(job_id)
-            # print(result)
             if result.data.status.lower() == 'completed':
                 break
             dur = poll_schedule[i]
