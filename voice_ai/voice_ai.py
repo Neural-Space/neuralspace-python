@@ -1,7 +1,8 @@
-import os
+import io
 import json
 import time
 import threading
+from typing import Any, List, Dict, Union, Optional, Callable
 
 import requests
 
@@ -13,7 +14,7 @@ class VoiceAI:
 
     def __init__(self, api_key=None):
         '''
-        VoiceAI instance to make transcription requests and more.
+        VoiceAI instance to make transcription requests
         '''
         if api_key is not None:
             self._api_key = api_key
@@ -43,19 +44,57 @@ class VoiceAI:
 
     def transcribe(
         self,
-        file,
-        lang=None,
-        mode=None,
-        number_formatting=None,
-        language_detect=False,
-        speaker_diarization=False,
-        timeout=None,
-        on_complete=None,
-        on_complete_kwargs={},
-        poll_schedule=None,
-    ):
+        file: Union[str, bytes, io.BytesIO],
+        lang: Optional[str] = None,
+        mode: Optional[str] = None,
+        number_formatting: Optional[str] = None,
+        language_detect: Optional[bool] = False,
+        speaker_diarization: Optional[bool] = False,
+        timeout: Optional[float] = None,
+        on_complete: Optional[Callable[[Dict, Dict[str, Any]], None]] = None,
+        on_complete_kwargs: Optional[Dict[str, Any]] = {},
+        poll_schedule: Optional[List[float]] = None,
+    ) -> str:
         '''
-        Transcribe an audio file
+        Transcribe an audio file.
+
+        Parameters
+        ----------
+        file: str, bytes, or io.BytesIO
+            Path to file, or data in bytes, or in-memory BytesIO object
+        lang: str, optional
+            2-letter language code, e.g. 'en', 'ar', etc.
+        mode: str, optional
+            The transcription mode to use, 'advanced' (default), or 'fast'
+        number_formatting: str, optional
+            How to represent numbers in transcriptions, 'words' (default) or 'digits'
+        language_detect: bool, optional
+            Enable language detection
+        speaker_diarization: bool, optional
+            Enable speaker diarization
+        timeout: float, optional
+            Timeout in seconds to queue the job
+        on_complete: callback, optional
+            If provided, will be called when the transcription job completes
+            Example:
+            ```
+            def callback(result: Dict[str, Any], **kwargs: Dict[str, Any]) -> None:
+                print(result)
+            ```
+        on_complete_kwargs: dict, optional
+            If provided, will be passed as **kwargs to on_complete, along with result
+        poll_schedule: List[float], optional
+            Sequence of sleep times after every poll attempt.
+            Last one continues to be used when number of attempts exceed len(poll_schedule).
+            e.g. [1, 1, 1, 5, 5, 10]
+
+        Returns
+        -------
+        job_id: str
+            Job ID of the newly created transcription job.
+            Can be used to fetch the job's status using `get_job_status(job_id)`
+            This call returns as soon as the job creation finishes.
+            To wait until the job completes, use `poll_until_complete(job_id)`
         '''
         if timeout is None:
             timeout = env.TIMEOUT_SEC
@@ -111,7 +150,10 @@ class VoiceAI:
         on_complete(result, **on_complete_kwargs)
 
 
-    def poll_until_complete(self, job_id, poll_schedule=None):
+    def poll_until_complete(self, job_id: str, poll_schedule: List[float] = None):
+        '''
+        Poll the status and wait till the job completes.
+        '''
         if not poll_schedule:
             poll_schedule = K.poll_schedule
         i = 0
@@ -148,11 +190,11 @@ class VoiceAI:
     ):
         job_config = K.DEFAULT_JOB_CONFIG.copy()
         if lang is not None:
-            job_config[K.k_lang] = lang
+            job_config[K.k_job_file_transcribe][K.k_lang] = lang
         if mode is not None:
-            job_config[K.k_mode] = mode
+            job_config[K.k_job_file_transcribe][K.k_mode] = mode
         if number_formatting is not None:
-            job_config[K.k_num_format] = number_formatting
+            job_config[K.k_job_file_transcribe][K.k_num_format] = number_formatting
 
         if language_detect:
             job_config[K.k_job_lang_detect] = {}
@@ -165,12 +207,9 @@ class VoiceAI:
     def _create_transcribe_job(self, file, job_config):
         sess = self._get_session()
         hdrs = self._create_headers()
+        file_data = utils.create_formdata_file(file)
         files = {
-            'files': (
-                os.path.basename(file),
-                open(file, 'rb'),
-                'application/octet-stream',
-            ),
+            'files': file_data,
         }
         data = {
             'config': json.dumps(job_config),
