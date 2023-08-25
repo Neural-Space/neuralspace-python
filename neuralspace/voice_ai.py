@@ -7,7 +7,7 @@ from typing import Any, List, Dict, Union, Optional, Callable
 
 import requests
 
-from voice_ai import env, utils, constants as K
+from neuralspace import env, utils, constants as K
 
 
 class VoiceAI:
@@ -46,13 +46,8 @@ class VoiceAI:
     def transcribe(
         self,
         file: Union[str, Path, bytes, io.BytesIO],
-        lang: Optional[str] = None,
-        mode: Optional[str] = None,
-        number_formatting: Optional[str] = None,
-        language_detect: Optional[bool] = False,
-        speaker_diarization: Optional[bool] = False,
-        timeout: Optional[float] = None,
-        on_complete: Optional[Callable[[Dict, Dict[str, Any]], None]] = None,
+        config: Dict[str, Any],
+        on_complete: Optional[Callable[[Dict[str, Any], Dict[str, Any]], None]] = None,
         on_complete_kwargs: Optional[Dict[str, Any]] = {},
         poll_schedule: Optional[List[float]] = None,
     ) -> str:
@@ -63,18 +58,30 @@ class VoiceAI:
         ----------
         file: str, Path, bytes, or io.BytesIO
             Path to file, or data in bytes, or in-memory BytesIO object
-        lang: str, optional
-            2-letter language code, e.g. 'en', 'ar', etc.
-        mode: str, optional
-            The transcription mode to use, 'advanced' (default), or 'fast'
-        number_formatting: str, optional
-            How to represent numbers in transcriptions, 'words' (default) or 'digits'
-        language_detect: bool, optional
-            Enable language detection
-        speaker_diarization: bool, optional
-            Enable speaker diarization
-        timeout: float, optional
-            Timeout in seconds to queue the job
+        config: dict
+            Job config details
+            e.g. 
+            ```
+            {
+                "file_transcription": {
+                    "language_id": "ar",
+                    "mode": "advanced",
+                    "number_formatting": "words",
+                },
+            }  
+            ```
+            To enable language detection and speaker diarization:
+            ```
+            {
+                "file_transcription": {
+                    "language_id": "ar",
+                    "mode": "advanced",
+                    "number_formatting": "words",
+                },
+                "language_detect": {},
+                "speaker_diarization": {},
+            }  
+            ```
         on_complete: callback, optional
             If provided, will be called when the transcription job completes
             Example:
@@ -97,39 +104,7 @@ class VoiceAI:
             This call returns as soon as the job creation finishes.
             To wait until the job completes, use `poll_until_complete(job_id)`
         '''
-        if timeout is None:
-            timeout = env.TIMEOUT_SEC
-        result = self._transcribe(
-            file,
-            lang=lang,
-            mode=mode,
-            number_formatting=number_formatting,
-            language_detect=language_detect,
-            speaker_diarization=speaker_diarization,
-            on_complete=on_complete,
-            on_complete_kwargs=on_complete_kwargs,
-            poll_schedule=poll_schedule,
-        )
-        return result
-
-
-    def _transcribe(
-        self,
-        file,
-        lang=None,
-        mode=None,
-        number_formatting=None,
-        language_detect=False,
-        speaker_diarization=False,
-        on_complete=None,
-        on_complete_kwargs=None,
-        poll_schedule=None,
-    ):
-        job_config = self._create_job_config(
-            lang=lang, mode=mode, number_formatting=number_formatting,
-            language_detect=language_detect, speaker_diarization=speaker_diarization,
-        )
-        job_id = self._create_transcribe_job(file, job_config)
+        job_id = self._create_transcribe_job(file, config)
         if on_complete is not None:
             if on_complete_kwargs is None:
                 on_complete_kwargs = {}
@@ -171,7 +146,7 @@ class VoiceAI:
 
 
     def get_job_status(self, job_id):
-        url = f'{K.JOBS_URL.rstrip("/")}/{job_id}'
+        url = f'{K.FULL_JOBS_URL.rstrip("/")}/{job_id}'
         hdrs = self._create_headers()
         sess = self._get_session()
         r = sess.get(url, headers=hdrs)
@@ -179,30 +154,6 @@ class VoiceAI:
             return utils.AttrDict(r.json())
         else:
             raise ValueError(r.text)
-
-
-    def _create_job_config(
-        self,
-        lang=None,
-        mode=None,
-        number_formatting=None,
-        language_detect=False,
-        speaker_diarization=False,
-    ):
-        job_config = K.DEFAULT_JOB_CONFIG.copy()
-        if lang is not None:
-            job_config[K.k_job_file_transcribe][K.k_lang] = lang
-        if mode is not None:
-            job_config[K.k_job_file_transcribe][K.k_mode] = mode
-        if number_formatting is not None:
-            job_config[K.k_job_file_transcribe][K.k_num_format] = number_formatting
-
-        if language_detect:
-            job_config[K.k_job_lang_detect] = {}
-        if speaker_diarization:
-            job_config[K.k_job_spk_diarize] = {}
-
-        return job_config
 
 
     def _create_transcribe_job(self, file, job_config):
@@ -215,7 +166,7 @@ class VoiceAI:
         data = {
             'config': json.dumps(job_config),
         }
-        r = sess.post(K.JOBS_URL, headers=hdrs, data=data, files=files)
+        r = sess.post(K.FULL_JOBS_URL, headers=hdrs, data=data, files=files)
         if r.status_code == 200:
             job_id = r.json()['data'][K.k_job_id]
             return job_id
