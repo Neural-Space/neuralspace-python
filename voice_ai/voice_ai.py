@@ -2,6 +2,7 @@ import io
 import json
 import time
 import threading
+from pathlib import Path
 from typing import Any, List, Dict, Union, Optional, Callable
 
 import requests
@@ -44,7 +45,7 @@ class VoiceAI:
 
     def transcribe(
         self,
-        file: Union[str, bytes, io.BytesIO],
+        file: Union[str, Path, bytes, io.BytesIO],
         lang: Optional[str] = None,
         mode: Optional[str] = None,
         number_formatting: Optional[str] = None,
@@ -60,7 +61,7 @@ class VoiceAI:
 
         Parameters
         ----------
-        file: str, bytes, or io.BytesIO
+        file: str, Path, bytes, or io.BytesIO
             Path to file, or data in bytes, or in-memory BytesIO object
         lang: str, optional
             2-letter language code, e.g. 'en', 'ar', etc.

@@ -2,6 +2,7 @@ import os
 import io
 import asyncio
 from uuid import uuid4
+from pathlib import Path
 from functools import partial
 
 
@@ -36,7 +37,7 @@ def run_async_as_sync(func, *args, **kwargs):
 def get_filename(file):
     if file is None:
         raise ValueError('No file given')
-    if isinstance(file, str):
+    if isinstance(file, (str, Path)):
         if not os.path.exists(file):
             raise ValueError(
                 f'No such file: {file}'
@@ -54,7 +55,7 @@ def get_filename(file):
 def get_content(file):
     if file is None:
         raise ValueError('No file given')
-    if isinstance(file, str):
+    if isinstance(file, (str, Path)):
         if not os.path.exists(file):
             raise ValueError(
                 f'No such file: {file}'
