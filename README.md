@@ -104,5 +104,5 @@ def callback(result):
 
 job_id = vai.transcribe(file='path/to/audio.wav', config=config, on_complete=callback)
 ```  
-Note: `transcribe()` will return the `job_id`` as soon as the job is scheduled, and the provided callback will be called on a new thread.  
+Note: `transcribe()` will return the `job_id` as soon as the job is scheduled, and the provided callback will be called on a new thread.  
 The calling thread will not be blocked in this case.  
