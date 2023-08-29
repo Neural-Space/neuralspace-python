@@ -47,7 +47,7 @@ class VoiceAI:
     def transcribe(
         self,
         file: Union[str, Path, bytes, io.BytesIO],
-        config: Union[Dict[str, Any], str],
+        config: Union[Dict[str, Any], str, Path, io.IOBase],
         on_complete: Optional[Callable[[Dict[str, Any], Dict[str, Any]], None]] = None,
         on_complete_kwargs: Optional[Dict[str, Any]] = {},
         poll_schedule: Optional[List[float]] = None,
@@ -59,7 +59,7 @@ class VoiceAI:
         ----------
         file: str, Path, bytes, or io.BytesIO
             Path to file, or data in bytes, or in-memory BytesIO object
-        config: dict or str
+        config: dict, str, Path or io.IOBase
             Job config details
             e.g. 
             ```
@@ -125,15 +125,17 @@ class VoiceAI:
 
     def _resolve_config(self, config):
         cfg = {}
-        if isinstance(config, str):
+        if isinstance(config, (str, Path)):
             if os.path.exists(config):
                 with open(config) as fp:
-                    cfg = json.load(config)
+                    cfg = json.load(fp)
             else:
                 try:
                     cfg = json.loads(config)
                 except:
-                    raise ValueError('Could not parse provided JSON config')
+                    raise ValueError(f'Could not parse provided JSON config: {config}')
+        elif isinstance(config, io.IOBase):
+            cfg = json.load(config)
         else:
             cfg = config
 

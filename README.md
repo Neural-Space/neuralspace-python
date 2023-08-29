@@ -63,13 +63,27 @@ config = {
 ```  
 
 #### Job Config
-Instead of providing the job config as a `dict`, you can provide it as a `str` value.  
-In this case, it should either be a serialized JSON value or the path to a JSON file.  
+Instead of providing config as a `dict`, you can provide it as a `str`, `pathlib.Path` or a file-like object.  
 ```python
-config = '{"file_transcription": {"language_id": "en", "mode": "advanced", "number_formatting": "words"}}'
-# or,
+job_id = vai.transcribe(
+    file='path/to/audio.wav',
+    config='{"file_transcription": {"language_id": "en", "mode": "advanced", "number_formatting": "words"}}',
+)
+
+# or, 
+
+job_id = vai.transcribe(
+    file='path/to/audio.wav',
+    config='path/to/config.json',
+)
+
+# or, 
+
 with open('path/to/config.json') as fp:
-    config = json.load(fp)
+    job_id = vai.transcribe(
+        file='path/to/audio.wav',
+        config=fp
+    )
 ```  
 
 #### Wait for completion
