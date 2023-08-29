@@ -1,4 +1,5 @@
 import io
+import os
 import json
 import time
 import threading
@@ -46,7 +47,7 @@ class VoiceAI:
     def transcribe(
         self,
         file: Union[str, Path, bytes, io.BytesIO],
-        config: Dict[str, Any],
+        config: Union[Dict[str, Any], str],
         on_complete: Optional[Callable[[Dict[str, Any], Dict[str, Any]], None]] = None,
         on_complete_kwargs: Optional[Dict[str, Any]] = {},
         poll_schedule: Optional[List[float]] = None,
@@ -58,7 +59,7 @@ class VoiceAI:
         ----------
         file: str, Path, bytes, or io.BytesIO
             Path to file, or data in bytes, or in-memory BytesIO object
-        config: dict
+        config: dict or str
             Job config details
             e.g. 
             ```
@@ -104,6 +105,7 @@ class VoiceAI:
             This call returns as soon as the job creation finishes.
             To wait until the job completes, use `poll_until_complete(job_id)`
         '''
+        config = self._resolve_config(config)
         job_id = self._create_transcribe_job(file, config)
         if on_complete is not None:
             if on_complete_kwargs is None:
@@ -119,6 +121,25 @@ class VoiceAI:
             )
             t.start()
         return job_id
+
+
+    def _resolve_config(self, config):
+        cfg = {}
+        if isinstance(config, str):
+            if os.path.exists(config):
+                with open(config) as fp:
+                    cfg = json.load(config)
+            else:
+                try:
+                    cfg = json.loads(config)
+                except:
+                    raise ValueError('Could not parse provided JSON config')
+        else:
+            cfg = config
+
+        if not isinstance(cfg, dict):
+            raise ValueError(f'Invalid type for config: {type(cfg)}')
+        return cfg
 
 
     def poll_and_call(self, job_id, on_complete=None, on_complete_kwargs={}, poll_schedule=None):
