@@ -3,7 +3,7 @@
 
 ## Installation
 ```bash
-pip install 'git+https://github.com/Neural-Space/test-voice-ai-client-python.git'
+pip install voice-ai
 ```  
 
 
