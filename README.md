@@ -97,7 +97,7 @@ with vai.stream('en') as ws:
         resp = ws.recv()
         resp = json.loads(resp)
         text = resp['text']
-        # output formatting; new lines on every 'full' utterance
+        # optional output formatting; new lines on every 'full' utterance
         if resp['full']:
             print('\r' + ' ' * 120, end='', flush=True)
             print(f'\r{text}', flush=True)
