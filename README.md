@@ -1,3 +1,5 @@
+[![PyPI version](https://badge.fury.io/py/voice-ai.svg)](https://badge.fury.io/py/voice-ai)
+
 # NeuralSpace VoiceAI Python Client
 
 
