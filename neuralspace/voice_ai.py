@@ -3,10 +3,13 @@ import os
 import json
 import time
 import threading
+from uuid import uuid4
 from pathlib import Path
+from contextlib import contextmanager
 from typing import Any, List, Dict, Union, Optional, Callable
 
 import requests
+import websocket
 
 from neuralspace import env, utils, constants as K
 
@@ -58,9 +61,9 @@ class VoiceAI:
         Parameters
         ----------
         file: str, Path, bytes, or io.BytesIO
-            Path to file, or data in bytes, or in-memory BytesIO object
+            Path to file, or data in bytes, or in-memory BytesIO object.
         config: dict, str, Path or io.IOBase
-            Job config details
+            Job config details.\n
             e.g. 
             ```
             {
@@ -84,25 +87,25 @@ class VoiceAI:
             }  
             ```
         on_complete: callback, optional
-            If provided, will be called when the transcription job completes
+            If provided, will be called when the transcription job completes.\n
             Example:
             ```
             def callback(result: Dict[str, Any], **kwargs: Dict[str, Any]) -> None:
                 print(result)
             ```
         on_complete_kwargs: dict, optional
-            If provided, will be passed as **kwargs to on_complete, along with result
+            If provided, will be passed as **kwargs to on_complete, along with result.
         poll_schedule: List[float], optional
-            Sequence of sleep times after every poll attempt.
-            Last one continues to be used when number of attempts exceed len(poll_schedule).
+            Sequence of sleep times after every poll attempt.\n
+            Last one continues to be used when number of attempts exceed len(poll_schedule).\n
             e.g. [1, 1, 1, 5, 5, 10]
 
         Returns
         -------
         job_id: str
-            Job ID of the newly created transcription job.
-            Can be used to fetch the job's status using `get_job_status(job_id)`
-            This call returns as soon as the job creation finishes.
+            Job ID of the newly created transcription job.\n
+            Can be used to fetch the job's status using `get_job_status(job_id)`\n
+            This call returns as soon as the job creation finishes.\n
             To wait until the job completes, use `poll_until_complete(job_id)`
         '''
         config = self._resolve_config(config)
@@ -121,6 +124,48 @@ class VoiceAI:
             )
             t.start()
         return job_id
+
+
+    @contextmanager
+    def stream(self, language_id: str, timeout: float = None):
+        '''
+        Streaming real-time transcription.\n
+        Context manager that returns a websocket connection.
+        ```
+        with vai.stream('en') as ws:
+            ws.send_binary(...)
+            ws.recv()
+        ```
+
+        Parameters
+        ----------
+        language_id: str
+            2-letter ISO language code.
+        timeout: float, optional
+            Timeout duration of the websocket connection in seconds
+        '''
+        if timeout is None:
+            timeout = K.timeout
+        token = self._get_short_lived_token(timeout)
+        url = f'{K.FULL_STREAM_URL}/{language_id}/{token}/{uuid4()}'
+        ws = websocket.WebSocket()
+        ws.connect(url, timeout=timeout)
+        try:
+            yield ws
+        finally:
+            ws.close()
+            ws.shutdown()
+
+
+    def _get_short_lived_token(self, timeout):
+        url = f'{K.FULL_TOKEN_URL}?duration={timeout}'
+        hdrs = self._create_headers()
+        sess = self._get_session()
+        r = sess.get(url, headers=hdrs)
+        if r.status_code == 200:
+            return r.json()['data']['token']
+        else:
+            raise ValueError(r.text)
 
 
     def _resolve_config(self, config):
