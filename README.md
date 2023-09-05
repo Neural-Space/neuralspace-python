@@ -52,6 +52,17 @@ print(result)
 ```  
 
 ### Streaming Real-Time Transcription
+The following example shows how to use NeuralSpace VoiceAI to transcribe microphone input in real-time.  
+It uses the PyAudio library: `pip install pyaudio`  
+PyAudio depends on the PortAudio library. It needs to be installed via your OS package manager.  
+* For Mac OS X
+    ```bash
+    brew install portaudio
+    ```
+* For Debian/Ubuntu Linux
+    ```bash
+    apt install portaudio19-dev
+    ```
 
 ```python
 import json
