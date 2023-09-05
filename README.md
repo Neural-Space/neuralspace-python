@@ -1,11 +1,11 @@
-[![PyPI version](https://badge.fury.io/py/voice-ai.svg)](https://badge.fury.io/py/voice-ai)
+[![PyPI version](https://badge.fury.io/py/neuralspace.svg)](https://badge.fury.io/py/neuralspace)
 
 # NeuralSpace VoiceAI Python Client
 
 
 ## Installation
 ```bash
-pip install voice-ai
+pip install -U neuralspace
 ```  
 
 
