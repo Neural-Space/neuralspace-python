@@ -157,6 +157,30 @@ class VoiceAI:
             ws.shutdown()
 
 
+    def languages(self, type: str) -> List[str]:
+        '''
+        Get supported languages based on transcription type.
+
+        Parameters
+        ----------
+        type: str
+            Transcription type. `file` or `stream`
+
+        Returns
+        -------
+        languages: List[str]
+            List of language codes
+        '''
+        url = f'{K.FULL_LANGS_URL}?type={type}'
+        hdrs = self._create_headers()
+        sess = self._get_session()
+        r = sess.get(url, headers=hdrs)
+        if r.status_code == 200:
+            return r.json()['data']['languages']
+        else:
+            raise ValueError(r.text)
+
+
     def _get_short_lived_token(self, timeout):
         url = f'{K.FULL_TOKEN_URL}?duration={timeout}'
         hdrs = self._create_headers()

@@ -123,6 +123,16 @@ with vai.stream('en') as ws:
 
 ## More Features
 
+#### List Languages
+To get the list of supported language codes based on the transcription type, use:  
+```python
+# for file transcription
+langs = vai.languages('file')
+
+# for streaming transcription
+langs = vai.languages('stream')
+```
+
 #### Language Detection and Speaker Diarization
 To enable language detection and speaker diarization, update the config as below:  
 ```python
@@ -161,7 +171,7 @@ with open('path/to/config.json') as fp:
     )
 ```  
 
-#### Wait for completion
+#### Wait for Completion
 You can also poll for the status and wait until the job completes:  
 ```python
 result = vai.poll_until_complete(job_id)

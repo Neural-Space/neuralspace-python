@@ -12,12 +12,17 @@ STREAM_URL = 'voice/stream/live/transcribe'
 if env.STREAM_URL is not None:
     STREAM_URL = env.STREAM_URL
 
+LANGS_URL = 'api/v1/languages'
+if env.LANGS_URL is not None:
+    LANGS_URL = env.LANGS_URL
+
 TOKEN_URL = 'api/v1/token'
 if env.TOKEN_URL is not None:
     TOKEN_URL = env.TOKEN_URL
 
 FULL_JOBS_URL = f'{BASE_URL.rstrip("/")}/{JOBS_URL.strip("/")}'
 FULL_STREAM_URL = f'{BASE_URL.replace("https://", "wss://").rstrip("/")}/{STREAM_URL.strip("/")}'
+FULL_LANGS_URL = f'{BASE_URL.rstrip("/")}/{LANGS_URL.strip("/")}'
 FULL_TOKEN_URL = f'{BASE_URL.rstrip("/")}/{TOKEN_URL.strip("/")}'
 
 k_job_id = 'jobId'
