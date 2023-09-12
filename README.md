@@ -123,7 +123,7 @@ with vai.stream('en') as ws:
 
 ## More Features
 
-Detailed features and config options are available in the [NeuralSpace VoiceAI Docs](https://voice-dev.neuralspace.ai/docs).
+To enable additional features for file transcription such as automatic language detection, speaker diarization, translation and more, check out the [NeuralSpace VoiceAI Docs](https://voice-dev.neuralspace.ai/docs).  
 
 #### List Languages
 To get the list of supported language codes based on the transcription type, use:  
@@ -135,20 +135,6 @@ langs = vai.languages('file')
 langs = vai.languages('stream')
 ```
 
-#### Language Detection and Speaker Diarization
-To enable language detection and speaker diarization, update the config as below:  
-```python
-config = {
-    "file_transcription": {
-        "language_id": "en",
-        "mode": "advanced",
-        "number_formatting": "words",
-    },
-    "language_detect": {},
-    "speaker_diarization": {},
-}
-```  
-
 #### Job Config
 Instead of providing config as a `dict`, you can provide it as a `str`, `pathlib.Path` or a file-like object.  
 ```python
@@ -156,16 +142,12 @@ job_id = vai.transcribe(
     file='path/to/audio.wav',
     config='{"file_transcription": {"language_id": "en", "mode": "advanced", "number_formatting": "words"}}',
 )
-
 # or, 
-
 job_id = vai.transcribe(
     file='path/to/audio.wav',
     config='path/to/config.json',
 )
-
 # or, 
-
 with open('path/to/config.json') as fp:
     job_id = vai.transcribe(
         file='path/to/audio.wav',
