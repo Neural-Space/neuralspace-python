@@ -25,7 +25,16 @@ FULL_STREAM_URL = f'{BASE_URL.replace("https://", "wss://").rstrip("/")}/{STREAM
 FULL_LANGS_URL = f'{BASE_URL.rstrip("/")}/{LANGS_URL.strip("/")}'
 FULL_TOKEN_URL = f'{BASE_URL.rstrip("/")}/{TOKEN_URL.strip("/")}'
 
+k_files = 'files'
+k_config = 'config'
+
+k_data = 'data'
+k_token = 'token'
 k_job_id = 'jobId'
+k_status = 'status'
+k_langs = 'languages'
+k_completed = 'completed'
+
 
 # (no.of times, sleep duration of each time)
 poll_schedule = [

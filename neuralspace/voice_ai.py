@@ -41,6 +41,9 @@ class VoiceAI:
 
 
     def close(self):
+        '''
+        Close the underlying HTTP session.
+        '''
         try:
             self._session.close()
         except:
@@ -109,12 +112,13 @@ class VoiceAI:
             To wait until the job completes, use `poll_until_complete(job_id)`
         '''
         config = self._resolve_config(config)
-        job_id = self._create_transcribe_job(file, config)
+        resp = self._create_transcribe_job(file, config)
+        job_id = resp[K.k_data][K.k_job_id]
         if on_complete is not None:
             if on_complete_kwargs is None:
                 on_complete_kwargs = {}
             t = threading.Thread(
-                target=self.poll_and_call,
+                target=self._poll_and_call,
                 args=(job_id,),
                 kwargs={
                     'on_complete': on_complete,
@@ -127,7 +131,7 @@ class VoiceAI:
 
 
     @contextmanager
-    def stream(self, language_id: str, timeout: float = None):
+    def stream(self, language_id: str, timeout: float = None) -> websocket.WebSocket:
         '''
         Streaming real-time transcription.\n
         Context manager that returns a websocket connection.
@@ -175,10 +179,51 @@ class VoiceAI:
         hdrs = self._create_headers()
         sess = self._get_session()
         r = sess.get(url, headers=hdrs)
-        if r.status_code == 200:
-            return r.json()['data']['languages']
-        else:
-            raise ValueError(r.text)
+        resp = utils.get_json_resp(r)
+        langs = resp[K.k_data][K.k_langs]
+        return langs
+
+
+    def get_job_status(self, job_id: str) -> Dict[str, Any]:
+        '''
+        Get status of a transcription job
+
+        Parameters
+        ----------
+        job_id: str
+            The id of the transcription job
+
+        Returns
+        -------
+        result: dict
+            The current status of the job.
+        '''
+        url = f'{K.FULL_JOBS_URL.rstrip("/")}/{job_id}'
+        hdrs = self._create_headers()
+        sess = self._get_session()
+        r = sess.get(url, headers=hdrs)
+        resp = utils.get_json_resp(r)
+        return resp
+
+
+    def poll_until_complete(self, job_id: str, poll_schedule: List[float] = None):
+        '''
+        Poll the status and wait till the job completes.
+        '''
+        if not poll_schedule:
+            poll_schedule = K.poll_schedule
+        i = 0
+        result = None
+        while True:
+            result = self.get_job_status(job_id)
+            if result.get(K.k_data) is not None and \
+                    result[K.k_data].get(K.k_status, '').lower() == K.k_completed:
+                break
+            dur = poll_schedule[i]
+            if i < len(K.poll_schedule) - 1:
+                i += 1
+            time.sleep(dur)
+        return result
 
 
     def _get_short_lived_token(self, timeout):
@@ -186,10 +231,9 @@ class VoiceAI:
         hdrs = self._create_headers()
         sess = self._get_session()
         r = sess.get(url, headers=hdrs)
-        if r.status_code == 200:
-            return r.json()['data']['token']
-        else:
-            raise ValueError(r.text)
+        resp = utils.get_json_resp(r)
+        token = resp[K.k_data][K.k_token]
+        return token
 
 
     def _resolve_config(self, config):
@@ -213,39 +257,9 @@ class VoiceAI:
         return cfg
 
 
-    def poll_and_call(self, job_id, on_complete=None, on_complete_kwargs={}, poll_schedule=None):
+    def _poll_and_call(self, job_id, on_complete=None, on_complete_kwargs={}, poll_schedule=None):
         result = self.poll_until_complete(job_id, poll_schedule=poll_schedule)
         on_complete(result, **on_complete_kwargs)
-
-
-    def poll_until_complete(self, job_id: str, poll_schedule: List[float] = None):
-        '''
-        Poll the status and wait till the job completes.
-        '''
-        if not poll_schedule:
-            poll_schedule = K.poll_schedule
-        i = 0
-        result = None
-        while True:
-            result = self.get_job_status(job_id)
-            if result.data.status.lower() == 'completed':
-                break
-            dur = poll_schedule[i]
-            if i < len(K.poll_schedule) - 1:
-                i += 1
-            time.sleep(dur)
-        return result
-
-
-    def get_job_status(self, job_id):
-        url = f'{K.FULL_JOBS_URL.rstrip("/")}/{job_id}'
-        hdrs = self._create_headers()
-        sess = self._get_session()
-        r = sess.get(url, headers=hdrs)
-        if r.status_code == 200:
-            return utils.AttrDict(r.json())
-        else:
-            raise ValueError(r.text)
 
 
     def _create_transcribe_job(self, file, job_config):
@@ -253,17 +267,14 @@ class VoiceAI:
         hdrs = self._create_headers()
         file_data = utils.create_formdata_file(file)
         files = {
-            'files': file_data,
+            K.k_files: file_data,
         }
         data = {
-            'config': json.dumps(job_config),
+            K.k_config: json.dumps(job_config),
         }
         r = sess.post(K.FULL_JOBS_URL, headers=hdrs, data=data, files=files)
-        if r.status_code == 200:
-            job_id = r.json()['data'][K.k_job_id]
-            return job_id
-        else:
-            raise ValueError(r.text)
+        resp = utils.get_json_resp(r)
+        return resp
 
 
     def _create_headers(self):

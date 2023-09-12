@@ -123,6 +123,8 @@ with vai.stream('en') as ws:
 
 ## More Features
 
+Detailed features and config options are available in the [NeuralSpace VoiceAI Docs](https://voice-dev.neuralspace.ai/docs).
+
 #### List Languages
 To get the list of supported language codes based on the transcription type, use:  
 ```python
@@ -175,7 +177,7 @@ with open('path/to/config.json') as fp:
 You can also poll for the status and wait until the job completes:  
 ```python
 result = vai.poll_until_complete(job_id)
-print(result.data.result.transcription.transcript)
+print(result['data']['result']['transcription']['transcript'])
 ```  
 Note: This will block the calling thread until the job is complete.  
 
@@ -184,10 +186,9 @@ You can also provide a callback function when creating the job.
 It will be called with the result once the job completes.
 ```python
 def callback(result):
-    print(f'job completed: {result.data.jobId}')
-    print(result.data.result.transcription.transcript)
+    print(f'job completed: {result["data"]["jobId"]}')
+    print(result['data']['result']['transcription']['transcript'])
 
 job_id = vai.transcribe(file='path/to/audio.wav', config=config, on_complete=callback)
 ```  
-Note: `transcribe()` will return the `job_id` as soon as the job is scheduled, and the provided callback will be called on a new thread.  
-The calling thread will not be blocked in this case.  
+Note: `transcribe()` will return the `job_id` as soon as the job is scheduled, and the provided callback will be called on a new thread. The calling thread will not be blocked in this case.  

@@ -6,20 +6,6 @@ from pathlib import Path
 from functools import partial
 
 
-class AttrDict(dict):
-
-    __getattr__ = dict.__getitem__
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
-
-    def __init__(self, dct=None):
-        dct = dict() if not dct else dct
-        for key, value in dct.items():
-            if hasattr(value, 'keys'):
-                value = AttrDict(value)
-            self[key] = value
-
-
 async def run_sync_as_async(executor, func, *args, **kwargs):
     f = partial(func, *args, **kwargs)
     loop = asyncio.get_event_loop()
@@ -79,3 +65,10 @@ def create_formdata_file(file):
         'application/octet-stream',
     )
     return data
+
+
+def get_json_resp(r):
+    if r.status_code == 200 and \
+            r.headers.get('Content-type', '').startswith('application/json'):
+        return r.json()
+    raise ValueError(f'{r.status_code}: {r.text}')
