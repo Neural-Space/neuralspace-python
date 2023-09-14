@@ -123,7 +123,7 @@ with vai.stream('en') as ws:
 
 ## More Features
 
-To enable additional features for file transcription such as automatic language detection, speaker diarization, translation and more, check out the [NeuralSpace VoiceAI Docs](https://voice-dev.neuralspace.ai/docs).  
+To enable additional features for file transcription such as automatic language detection, speaker diarization, translation and more, check out the [NeuralSpace VoiceAI Docs](https://voice.neuralspace.ai/docs).  
 
 #### List Languages
 To get the list of supported language codes based on the transcription type, use:  

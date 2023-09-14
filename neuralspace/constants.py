@@ -1,6 +1,6 @@
 from neuralspace import env
 
-BASE_URL = 'https://voice-dev.neuralspace.ai'
+BASE_URL = 'https://voice.neuralspace.ai'
 if env.BASE_URL is not None:
     BASE_URL = env.BASE_URL
 
