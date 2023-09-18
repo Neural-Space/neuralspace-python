@@ -23,10 +23,15 @@ class VoiceAI:
         '''
         if api_key is not None:
             self._api_key = api_key
-        else:
+        elif env.API_KEY is not None:
             self._api_key = env.API_KEY
+        elif os.path.exists(K.API_KEY_PATH):
+            with open(K.API_KEY_PATH) as fp:
+                text = fp.read().strip()
+                if text:
+                    self._api_key = text
 
-        if self._api_key is None:
+        if not self._api_key:
             raise ValueError(
                 'Either provide api_key parameter, or set environment variable `NS_API_KEY`'
             )
@@ -131,7 +136,7 @@ class VoiceAI:
 
 
     @contextmanager
-    def stream(self, language_id: str, timeout: float = None) -> websocket.WebSocket:
+    def stream(self, language_id: str, timeout: Optional[float] = None) -> websocket.WebSocket:
         '''
         Streaming real-time transcription.\n
         Context manager that returns a websocket connection.
@@ -206,7 +211,7 @@ class VoiceAI:
         return resp
 
 
-    def poll_until_complete(self, job_id: str, poll_schedule: List[float] = None):
+    def poll_until_complete(self, job_id: str, poll_schedule: Optional[List[float]] = None):
         '''
         Poll the status and wait till the job completes.
         '''
