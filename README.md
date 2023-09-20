@@ -66,7 +66,7 @@ result = vai.poll_until_complete(job_id)
 print(result)
 ```  
 Output:  
-```json
+```
 Downloading sample audio file...
 Created job: 93e229c7-912d-43aa-9d87-96f873f69882
 Current status:
