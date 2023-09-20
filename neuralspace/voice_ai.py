@@ -21,6 +21,9 @@ class VoiceAI:
         '''
         VoiceAI instance to make transcription requests
         '''
+        self._api_key = None
+        self._session = None
+
         if api_key is not None:
             self._api_key = api_key
         elif env.API_KEY is not None:
@@ -35,8 +38,6 @@ class VoiceAI:
             raise ValueError(
                 'Either provide api_key parameter, or set environment variable `NS_API_KEY`'
             )
-
-        self._session = None
 
 
     def _get_session(self):

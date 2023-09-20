@@ -65,6 +65,53 @@ if env.TIMEOUT_SEC is not None:
     timeout = abs(float(env.TIMEOUT_SEC))
 
 
+# file format extensions
+
+FILE_EXTS = set([
+    '3gp',
+    'aa',
+    'aac',
+    'aax',
+    'act',
+    'aiff',
+    'alac',
+    'amr',
+    'ape',
+    'au',
+    'awb',
+    'dss',
+    'dvf',
+    'flac',
+    'gsm',
+    'iklax',
+    'ivs',
+    'm4a',
+    'm4b',
+    'm4p',
+    'mmf',
+    'mp3',
+    'mp4',
+    'mpc',
+    'msv',
+    'nmf',
+    'ogg',
+    'opus',
+    'ra',
+    'raw',
+    'rf64',
+    'sln',
+    'tta',
+    'voc',
+    'vox',
+    'wav',
+    'wma',
+    'wv',
+    'webm',
+    '8svx',
+    'cda',
+])
+
+
 # cli
 
 NS_HOME = Path.home() / '.cache' / 'neuralspace'
