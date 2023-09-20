@@ -27,7 +27,17 @@ vai = ns.VoiceAI(api_key='YOUR_API_KEY')
 ### File Transcription
 
 ```python
+import requests
 import neuralspace as ns
+
+filename = 'english_audio_sample.mp3'
+
+# Download the sample audio file
+print('Downloading sample audio file...')
+resp = requests.get('https://github.com/Neural-Space/neuralspace-examples/raw/main/datasets/transcription/en/english_audio_sample.mp3')
+with open(filename, 'wb') as fp:
+    fp.write(resp.content)
+
 
 vai = ns.VoiceAI()
 # or,
@@ -35,21 +45,130 @@ vai = ns.VoiceAI()
 
 # Setup job configuration
 config = {
-    "file_transcription": {
-        "language_id": "en",
-        "mode": "advanced",
-        "number_formatting": "words",
+    'file_transcription': {
+        'language_id': 'en',
+        'mode': 'advanced',
     },
 }
 
 # Create a new file transcription job
-job_id = vai.transcribe(file='path/to/audio.wav', config=config)
-print(job_id)
+job_id = vai.transcribe(file=filename, config=config)
+print(f'Created job: {job_id}')
 
 # Check the job's status
 result = vai.get_job_status(job_id)
+print(f'Current status:\n{result}')
+
+# This should finish in a minute for the sample audio used here.
+# It will depend on the duration of the audio file and other config options.
+print('Waiting for completion...')
+result = vai.poll_until_complete(job_id)
 print(result)
 ```  
+Output:  
+```json
+Downloading sample audio file...
+Created job: 93e229c7-912d-43aa-9d87-96f873f69882
+Current status:
+{
+  "success": True,
+  "message": "Data fetched successfully",
+  "data": {
+    "timestamp": 1695210581508,
+    "filename": "english_audio_sample.mp3",
+    "jobId": "93e229c7-912d-43aa-9d87-96f873f69882",
+    "filePath": "uploads/bf377596-7a1d-4de9-82a7-9799d83f0ad9",
+    "params": {
+      "file_transcription": {
+        "language_id": "en",
+        "mode": "advanced"
+      }
+    },
+    "status": "Queued",
+    "audioDuration": 131.568,
+    "messsage": "",
+    "progress": [
+      "Queued"
+    ]
+  }
+}
+Waiting for completion...
+{
+  "success": true,
+  "message": "Data fetched successfully",
+  "data": {
+    "timestamp": 1695210581508,
+    "filename": "english_audio_sample.mp3",
+    "jobId": "93e229c7-912d-43aa-9d87-96f873f69882",
+    "params": {
+      "file_transcription": {
+        "language_id": "en",
+        "mode": "advanced"
+      }
+    },
+    "status": "Completed",
+    "audioDuration": 131.568,
+    "messsage": "",
+    "progress": [
+      "queued",
+      "Started",
+      "Transcription Started",
+      "Transcription Completed",
+      "Completed"
+    ],
+    "result": {
+      "transcription": {
+        "transcript": "We've been at this for hours now. Have you found anything useful in any of those books? Not a single thing, Lewis. I'm sure that there must be something in this library. It's not like there's nothing left to be discovered. Well, I have to say that I'm tired of searching. I'm gonna take a little break. You come and cut us. I am getting a little hungry. Do you want to get someone to eat? Yeah. Food town's great right about now. What was that noise, Curtis? Did you hear that? Yes, I heard that, Lewis. I don't know, but it sounded like it came from the back of the library. Let's check it out. Okay, where you go first? Looks like a book is falling off one of the shelves. It's an old book, but it looks a bit. It's a little dusty and I can't make out what it says. Look at this, Lewis. The last treasure of Lima. Lima? Isn't that the capital city of Peru? Yes, Lewis. And it looks like there's been a treasure missing for centuries now. Look at this, Lewis. Apparently, lost treasure is located inside a temple on the outskirts of Lima. Looks like this book is a map to the treasure. Either even corn that's written down on this page. Let's get some food and plan out this next adventure. As soon as we get to Peru, I'll go straight to these coordinates that are written in the book. Great, I'll talk to you again on our land. 92, 93, 94. I'll meet at the exact location Lewis and I don't see anything. There's absolutely nothing to be seen here, just trees. Faith, look around, is there anything written on any tree? I hope this wasn't a waste of time.",
+        "timestamps": [
+          {
+            "word": "We've",
+            "start": 6.69,
+            "end": 7.03,
+            "conf": 0.99
+          },
+          {
+            "word": "been",
+            "start": 7.03,
+            "end": 7.09,
+            "conf": 0.99
+          },
+          {
+            "word": "at",
+            "start": 7.09,
+            "end": 7.23,
+            "conf": 0.99
+          },
+          {
+            "word": "this",
+            "start": 7.23,
+            "end": 7.37,
+            "conf": 0.97
+          },
+          {
+            "word": "for",
+            "start": 7.37,
+            "end": 7.47,
+            "conf": 0.97
+          },
+          {
+            "word": "hours",
+            "start": 7.47,
+            "end": 7.87,
+            "conf": 0.56
+          },
+          {
+            "word": "now.",
+            "start": 7.87,
+            "end": 8.43,
+            "conf": 1
+          }
+          ...
+        ]
+      }
+    }
+  }
+}
+```
 
 ### Streaming Real-Time Transcription
 The following example shows how to use NeuralSpace VoiceAI to transcribe microphone input in real-time.  
