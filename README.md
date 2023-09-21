@@ -200,9 +200,12 @@ def listen(in_data, frame_count, time_info, status):
 
 # transfer from queue to websocket
 def send_audio(q, ws):
-    while True:
-        data = q.get()
-        ws.send_binary(data)
+    try:
+        while True:
+            data = q.get()
+            ws.send_binary(data)
+    except:
+        print('Stopped sending audio.')
 
 # initialize VoiceAI
 vai = ns.VoiceAI()
@@ -225,18 +228,22 @@ with vai.stream('en') as ws:
     t.start()
     print('Listening...')
     # start receiving results on the current thread
-    while True:
-        resp = ws.recv()
-        resp = json.loads(resp)
-        text = resp['text']
-        # optional output formatting; new lines on every 'full' utterance
-        if resp['full']:
-            print('\r' + ' ' * 120, end='', flush=True)
-            print(f'\r{text}', flush=True)
-        else:
-            if len(text) > 120:
-                text = f'...{text[-115:]}'
-            print(f'\r{text}', end='', flush=True)
+    try:
+        while True:
+            resp = ws.recv()
+            resp = json.loads(resp)
+            text = resp['text']
+            # optional output formatting; new lines on every 'full' utterance
+            if resp['full']:
+                print('\r' + ' ' * 120, end='', flush=True)
+                print(f'\r{text}', flush=True)
+            else:
+                if len(text) > 120:
+                    text = f'...{text[-115:]}'
+                print(f'\r{text}', end='', flush=True)
+    except KeyboardInterrupt:
+        print('\nFinishing.')
+
 ```  
 
 
