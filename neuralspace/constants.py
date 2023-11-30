@@ -6,13 +6,17 @@ from neuralspace.version import version
 
 # env related stuff
 
-BASE_URL = 'https://voice.neuralspace.ai'
+BASE_URL = 'https://voice-dev.neuralspace.ai'
 if env.BASE_URL is not None:
     BASE_URL = env.BASE_URL
 
 JOBS_URL = 'api/v1/jobs'
 if env.JOBS_URL is not None:
     JOBS_URL = env.JOBS_URL
+
+TTS_URL = 'api/v1/tts'
+if env.TTS_URL is not None:
+    TTS_URL = env.TTS_URL
 
 STREAM_URL = 'voice/stream/live/transcribe'
 if env.STREAM_URL is not None:
@@ -33,6 +37,7 @@ FULL_JOBS_URL = f'{BASE_URL.rstrip("/")}/{JOBS_URL.strip("/")}'
 FULL_STREAM_URL = f'{BASE_URL.replace("https://", "wss://").rstrip("/")}/{STREAM_URL.strip("/")}'
 FULL_LANGS_URL = f'{BASE_URL.rstrip("/")}/{LANGS_URL.strip("/")}'
 FULL_TOKEN_URL = f'{BASE_URL.rstrip("/")}/{TOKEN_URL.strip("/")}'
+FULL_TTS_URL = f'{BASE_URL.rstrip("/")}/{TTS_URL.strip("/")}'
 
 
 # literals

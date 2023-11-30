@@ -288,3 +288,50 @@ class VoiceAI:
             'Authorization': self._api_key,
         }
         return hdrs
+
+    def synthesize(
+            self,
+            data: Union[Dict[str, Any], str, Path, io.IOBase],
+            ) -> str:
+        '''
+        Text to speech.
+        '''
+        data = self._resolve_config(data)
+        sess = self._get_session()
+        hdrs = self._create_headers()
+        r = sess.post(K.FULL_TTS_URL, headers=hdrs, json=data)
+        if r.status_code == 200 and data['stream'] == False:
+            return utils.get_json_resp(r) 
+        if r.status_code == 200 and data['stream'] == True:
+            return r.content
+    
+    def get_tts_job_status(self, job_id: str) -> Dict[str, Any]:
+        url = f'{K.FULL_TTS_URL.rstrip("/")}/{job_id}'
+        hdrs = self._create_headers()
+        sess = self._get_session()
+        r = sess.get(url, headers=hdrs)
+        if r.status_code == 200:
+            return utils.get_json_resp(r)
+        else:
+            raise ValueError(r.text)
+    
+    def get_tts_jobs(self, query_params: Union[Dict[str, Any], str, Path, io.IOBase]) -> Dict[str, Any]:
+        url = f'{K.FULL_TTS_URL.rstrip("/")}'
+        query_params = self._resolve_config(query_params)
+        hdrs = self._create_headers()
+        sess = self._get_session()
+        r = sess.get(url, headers=hdrs, params=query_params)
+        if r.status_code == 200:
+            return utils.get_json_resp(r)
+        else:
+            raise ValueError(r.text)
+    
+    def delete_tts_job(self, job_id: str) -> Dict[str, Any]:
+        url = f'{K.FULL_TTS_URL.rstrip("/")}/{job_id}'
+        hdrs = self._create_headers()
+        sess = self._get_session()
+        r = sess.delete(url, headers=hdrs)
+        if r.status_code == 200:
+            return utils.get_json_resp(r)
+        else:
+            raise ValueError(r.text)
