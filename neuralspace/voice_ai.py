@@ -137,7 +137,15 @@ class VoiceAI:
 
 
     @contextmanager
-    def stream(self, language_id: str, timeout: Optional[float] = None) -> websocket.WebSocket:
+    def stream(self,
+               language_id: str,
+               min_chunk_size: Optional[int] = 1,
+               max_chunk_size: Optional[int] = 5,
+               vad_threshold: Optional[float] = 0.5,
+               vad_min_silence: Optional[float] = 0.1,
+               disable_partial: Optional[bool] = False,
+               audio_format: Optional[str] = 'pcm_16k',
+               timeout: Optional[float] = None) -> websocket.WebSocket:
         '''
         Streaming real-time transcription.\n
         Context manager that returns a websocket connection.
@@ -151,13 +159,27 @@ class VoiceAI:
         ----------
         language_id: str
             2-letter ISO language code.
+        min_chunk_size: int
+            Minimum size in seconds processed for partial transcription results
+        max_chunk_size: int
+            Maximum size in seconds of audio chunks that are processed for full
+            results
+        vad_threshold: float
+            Sensitivity of the Voice Activity Detection (VAD)
+        vad_min_silence: float
+            Minimum duration in seconds of silence required to consider the
+            speech segment as finished
+        disable_partial: bool
+            Select whether to disable partial transcriptions or not
+        format:
+            ```pcm_8k``` for 8KHZ & ```pcm_16k``` 16KHz audios
         timeout: float, optional
             Timeout duration of the websocket connection in seconds
         '''
         if timeout is None:
             timeout = K.timeout
         token = self._get_short_lived_token(timeout)
-        url = f'{K.FULL_STREAM_URL}/{language_id}/{token}/{uuid4()}'
+        url = f'{K.FULL_STREAM_URL}/{language_id}/{token}/{uuid4()}?min_chunk_size={min_chunk_size}&max_chunk_size={max_chunk_size}&vad_threshold={vad_threshold}&vad_min_silence={vad_min_silence}&disable_partial={disable_partial}&format={audio_format}'
         ws = websocket.WebSocket()
         ws.connect(url, timeout=timeout)
         try:
