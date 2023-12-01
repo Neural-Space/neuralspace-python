@@ -321,7 +321,7 @@ Details of the job:
     "data": {
         "timestamp": 1701418685869,
         "jobId": "4170883b-5ef9-4395-8dd1-deef17e140f8",
-        "text": "\u0643\u064a\u0641 \u062d\u0627\u0644\u0643",
+        "text": "كيف حالك",
         "params": {
             "pace": 1,
             "volume": 1,
