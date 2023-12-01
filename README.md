@@ -246,6 +246,54 @@ with vai.stream('en') as ws:
 
 ```  
 
+### Text to Speech
+
+```python
+import neuralspace as ns
+
+vai = ns.VoiceAI()
+# print(vai.)
+# or,
+# vai = ns.VoiceAI(api_key='YOUR_API_KEY')
+
+# TTS job configuration
+data = {
+    "text": "hello how are you",
+    "speaker_id": "ar-female-Nadia-saudi-neutral",
+    "stream": True,
+    "config": {
+        "pace": 1,
+        "volume": 1,
+        "pitch_shift": 0.5,
+        "pitch_scale": 0.5
+    }
+}
+
+# result will either be the job metadata or final audio array, depending on \
+# whether stream is set to False or True
+result = vai.synthesize(data=data)
+print(result)
+
+# Fetching the details of previous job
+job_id = '520aabd3-907f-42ca-ae87-c28e96d44380' # example job_id
+result = vai.get_tts_job_status(job_id)
+print(result)
+
+# Fetching the details of all previous jobs
+query_params = {
+    "pageNumber": 2,
+    "pageSize": 10,
+    "sort": "asc"
+}
+result = vai.get_tts_jobs(query_params=query_params)
+print(result)
+
+# Delete the job 
+job_id = 'f3191e43-b409-4634-bb47-d403c5a4d0b3'
+result = vai.delete_tts_job(job_id)
+print(result)
+```
+
 
 ## More Features
 
@@ -261,8 +309,14 @@ langs = vai.languages('file')
 langs = vai.languages('stream')
 ```
 
+#### List voices
+To get the list of supported voices along with its metadata, use:
+```python
+voices = vai.voices()
+```
+
 #### Job Config
-Instead of providing config as a `dict`, you can provide it as a `str`, `pathlib.Path` or a file-like object.  
+Instead of providing any config or params as a `dict`, you can provide it as a `str`, `pathlib.Path` or a file-like object.  
 ```python
 job_id = vai.transcribe(
     file='path/to/audio.wav',

@@ -26,6 +26,10 @@ LANGS_URL = 'api/v1/languages'
 if env.LANGS_URL is not None:
     LANGS_URL = env.LANGS_URL
 
+VOICES_URL = 'api/v1/tts/voices'
+if env.VOICES_URL is not None:
+    VOICES_URL = env.VOICES_URL
+
 TOKEN_URL = 'api/v1/token'
 if env.TOKEN_URL is not None:
     TOKEN_URL = env.TOKEN_URL
@@ -36,6 +40,7 @@ if env.TOKEN_URL is not None:
 FULL_JOBS_URL = f'{BASE_URL.rstrip("/")}/{JOBS_URL.strip("/")}'
 FULL_STREAM_URL = f'{BASE_URL.replace("https://", "wss://").rstrip("/")}/{STREAM_URL.strip("/")}'
 FULL_LANGS_URL = f'{BASE_URL.rstrip("/")}/{LANGS_URL.strip("/")}'
+FULL_VOICES_URL = f'{BASE_URL.rstrip("/")}/{VOICES_URL.strip("/")}'
 FULL_TOKEN_URL = f'{BASE_URL.rstrip("/")}/{TOKEN_URL.strip("/")}'
 FULL_TTS_URL = f'{BASE_URL.rstrip("/")}/{TTS_URL.strip("/")}'
 
