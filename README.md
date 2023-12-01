@@ -267,7 +267,7 @@ data = {
     }
 }
 
-# result will the audio byte array, as stream is set to True
+# result will be an audio byte array, as stream is set to True
 result = vai.synthesize(data=data)
 print(f'result with stream=True:\n{result}')
 
