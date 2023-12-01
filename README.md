@@ -258,26 +258,33 @@ vai = ns.VoiceAI()
 
 # TTS job configuration
 data = {
-    "text": "hello how are you",
+    "text": "كيف حالك",
     "speaker_id": "ar-female-Nadia-saudi-neutral",
     "stream": True,
     "config": {
         "pace": 1,
-        "volume": 1,
-        "pitch_shift": 0.5,
-        "pitch_scale": 0.5
+        "volume": 1
     }
 }
 
-# result will either be the job metadata or final audio array, depending on \
-# whether stream is set to False or True
+# result will the audio byte array, as stream is set to True
 result = vai.synthesize(data=data)
-print(result)
+print(f'result with stream=True:\n{result}')
+
+# Creating a new job with stream=False
+data['stream'] = False
+# result will have the metadata of the job submitted along with the audio upload path
+result = vai.synthesize(data=data)
+print(f'result with stream=False:\n{result}')
 
 # Fetching the details of previous job
-job_id = '520aabd3-907f-42ca-ae87-c28e96d44380' # example job_id
+job_id = result['data']['jobid'] # example job_id
 result = vai.get_tts_job_status(job_id)
-print(result)
+print(f'Details of the job:\n{result}')
+
+# Delete the job 
+result = vai.delete_tts_job(job_id)
+print(f'Response after deleting the job:\n{result}')
 
 # Fetching the details of all previous jobs
 query_params = {
@@ -286,14 +293,117 @@ query_params = {
     "sort": "asc"
 }
 result = vai.get_tts_jobs(query_params=query_params)
-print(result)
+print(f'Fetching the details of all previous jobs:\n{result}')
 
-# Delete the job 
-job_id = 'f3191e43-b409-4634-bb47-d403c5a4d0b3'
-result = vai.delete_tts_job(job_id)
-print(result)
 ```
+Output:
+```
+result with stream=True:
+b'RIFF$\xb4\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00"V\x00\x00D\xac\x00\x00\x02\x00\x10\x00data\x00\xb4\x00\x00\x0e\x00\x0b\x00\x0e\x00\x0f\x00\x0f\x00\x0e\x00\r\x00\t\x00\x0c\x00\r\x00\x12\x00\x0c\x00\r\x00\n\x00\x0b\x00\x0b\x00\x0f\x00\x10\x00\x0b\x00\r\x00\x11\x00\x10\x00\x11\x00\x12\x00\x11\x00\x11\x00\x0b\x00\x10\x00\x10\x00\x0b\x00\x12\x00\x0e\x00\t\x00\x12\x00\x19\x00\x14\x00\x12\x00\x0f\x00\x12\x00\r\x00\r\x00\x10\x00...'
 
+result with stream=False:
+{
+    "success": true,
+    "message": "Job created successfully",
+    "data": {
+        "jobId": "8cf89d36-b55e-4c4f-a480-65bcd8484fae",
+        "timestamp": 1701418572768,
+        "result": {
+            "save_path": "uploads/e167dc9f-7788-4c51-ba97-40ab512a5fb2"
+        }
+    }
+}
+
+Details of the job:
+{
+    "success": true,
+    "message": "Data fetched successfully",
+    "data": {
+        "timestamp": 1701418685869,
+        "jobId": "4170883b-5ef9-4395-8dd1-deef17e140f8",
+        "text": "\u0643\u064a\u0641 \u062d\u0627\u0644\u0643",
+        "params": {
+            "pace": 1,
+            "volume": 1,
+            "speaker_id": "ar-female-Nadia-saudi-neutral",
+            "language_id": "ar"
+        },
+        "status": "Completed",
+        "result": {
+            "save_path": "uploads/90c8a681-c053-47e6-ad26-1a10058e43f4"
+        },
+        "audioDuration": 2
+    }
+}
+
+Response after deleting the job:
+{
+    "success": true,
+    "message": "Job and associated files deleted successfully.",
+    "data": {
+        "deletedCount": 1
+    }
+}
+
+Fetching the details of all previous jobs:
+{
+    "success": true,
+    "message": "Data fetched successfully",
+    "data": {
+        "jobs": [
+            {
+                "timestamp": 1701326878096,
+                "jobId": "a5bcc6fe-f3c6-4efa-ba26-d2e28e8e8914",
+                "text": "hello how are you",
+                "params": {
+                    "pace": 1,
+                    "volume": 1,
+                    "pitch_shift": 0.5,
+                    "pitch_scale": 0.5,
+                    "speaker_id": "ar-female-Nadia-saudi-neutral",
+                    "language_id": "ar"
+                },
+                "status": "Completed",
+                "audioDuration": 2
+            },
+            {
+                "timestamp": 1701326955634,
+                "jobId": "b3bdddbe-3b85-4068-ba59-d659e7469bd3",
+                "text": "hello how are you",
+                "params": {
+                    "pace": 1,
+                    "volume": 1,
+                    "pitch_shift": 0.5,
+                    "pitch_scale": 0.5,
+                    "speaker_id": "ar-female-Nadia-saudi-neutral",
+                    "language_id": "ar"
+                },
+                "status": "Completed",
+                "audioDuration": 2
+            },
+            {
+                "timestamp": 1701326972188,
+                "jobId": "567c720a-37c5-4132-bc10-647207d8e1ad",
+                "text": "hello how are you",
+                "params": {
+                    "pace": 1,
+                    "volume": 1,
+                    "pitch_shift": 0.5,
+                    "pitch_scale": 0.5,
+                    "speaker_id": "ar-female-Nadia-saudi-neutral",
+                    "language_id": "ar"
+                },
+                "status": "Completed",
+                "audioDuration": 2
+            }
+            ...
+        ],
+        "total": 27,
+        "pageSize": 10,
+        "page": 2
+    }
+}
+```
 
 ## More Features
 
