@@ -278,7 +278,7 @@ result = vai.synthesize(data=data)
 print(f'result with stream=False:\n{result}')
 
 # Fetching the details of previous job
-job_id = result['data']['jobid'] # example job_id
+job_id = result['data']['jobId'] # example job_id
 result = vai.get_tts_job_status(job_id)
 print(f'Details of the job:\n{result}')
 
