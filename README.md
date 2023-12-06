@@ -330,7 +330,7 @@ Details of the job:
         },
         "status": "Completed",
         "result": {
-            "save_path": "uploads/90c8a681-c053-47e6-ad26-1a10058e43f4"
+            "save_path": "https://largefilestoreprod.blob.core.windows.net/common/uploads/6272df27-81a6-442a-bb7a-f98b63243604"
         },
         "audioDuration": 2
     }
