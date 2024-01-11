@@ -246,6 +246,164 @@ with vai.stream('en') as ws:
 
 ```  
 
+### Text to Speech
+
+```python
+import neuralspace as ns
+
+vai = ns.VoiceAI()
+# print(vai.)
+# or,
+# vai = ns.VoiceAI(api_key='YOUR_API_KEY')
+
+# TTS job configuration
+data = {
+    "text": "كيف حالك",
+    "speaker_id": "ar-female-Nadia-saudi-neutral",
+    "stream": True,
+    "config": {
+        "pace": 1,
+        "volume": 1
+    }
+}
+
+# result will be an audio byte array, as stream is set to True
+result = vai.synthesize(data=data)
+print(f'result with stream=True:\n{result}')
+
+# Creating a new job with stream=False
+data['stream'] = False
+# result will have the metadata of the job submitted along with the audio upload path
+result = vai.synthesize(data=data)
+print(f'result with stream=False:\n{result}')
+
+# Fetching the details of previous job
+job_id = result['data']['jobId'] # example job_id
+result = vai.get_tts_job_status(job_id)
+print(f'Details of the job:\n{result}')
+
+# Delete the job 
+result = vai.delete_tts_job(job_id)
+print(f'Response after deleting the job:\n{result}')
+
+# Fetching the details of all previous jobs
+query_params = {
+    "pageNumber": 2,
+    "pageSize": 10,
+    "sort": "asc"
+}
+result = vai.get_tts_jobs(query_params=query_params)
+print(f'Fetching the details of all previous jobs:\n{result}')
+
+```
+Output:
+```
+result with stream=True:
+b'RIFF$\xb4\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00"V\x00\x00D\xac\x00\x00\x02\x00\x10\x00data\x00\xb4\x00\x00\x0e\x00\x0b\x00\x0e\x00\x0f\x00\x0f\x00\x0e\x00\r\x00\t\x00\x0c\x00\r\x00\x12\x00\x0c\x00\r\x00\n\x00\x0b\x00\x0b\x00\x0f\x00\x10\x00\x0b\x00\r\x00\x11\x00\x10\x00\x11\x00\x12\x00\x11\x00\x11\x00\x0b\x00\x10\x00\x10\x00\x0b\x00\x12\x00\x0e\x00\t\x00\x12\x00\x19\x00\x14\x00\x12\x00\x0f\x00\x12\x00\r\x00\r\x00\x10\x00...'
+
+result with stream=False:
+{
+    "success": true,
+    "message": "Job created successfully",
+    "data": {
+        "jobId": "8cf89d36-b55e-4c4f-a480-65bcd8484fae",
+        "timestamp": 1701418572768,
+        "result": {
+            "save_path": "https://largefilestoreprod.blob.core.windows.net/common/uploads/6272df27-81a6-442a-bb7a-f98b63243604"
+        }
+    }
+}
+
+Details of the job:
+{
+    "success": true,
+    "message": "Data fetched successfully",
+    "data": {
+        "timestamp": 1701418685869,
+        "jobId": "4170883b-5ef9-4395-8dd1-deef17e140f8",
+        "text": "كيف حالك",
+        "params": {
+            "pace": 1,
+            "volume": 1,
+            "speaker_id": "ar-female-Nadia-saudi-neutral",
+            "language_id": "ar"
+        },
+        "status": "Completed",
+        "result": {
+            "save_path": "https://largefilestoreprod.blob.core.windows.net/common/uploads/6272df27-81a6-442a-bb7a-f98b63243604"
+        },
+        "audioDuration": 2
+    }
+}
+
+Response after deleting the job:
+{
+    "success": true,
+    "message": "Job and associated files deleted successfully.",
+    "data": {
+        "deletedCount": 1
+    }
+}
+
+Fetching the details of all previous jobs:
+{
+    "success": true,
+    "message": "Data fetched successfully",
+    "data": {
+        "jobs": [
+            {
+                "timestamp": 1701326878096,
+                "jobId": "a5bcc6fe-f3c6-4efa-ba26-d2e28e8e8914",
+                "text": "hello how are you",
+                "params": {
+                    "pace": 1,
+                    "volume": 1,
+                    "pitch_shift": 0.5,
+                    "pitch_scale": 0.5,
+                    "speaker_id": "ar-female-Nadia-saudi-neutral",
+                    "language_id": "ar"
+                },
+                "status": "Completed",
+                "audioDuration": 2
+            },
+            {
+                "timestamp": 1701326955634,
+                "jobId": "b3bdddbe-3b85-4068-ba59-d659e7469bd3",
+                "text": "hello how are you",
+                "params": {
+                    "pace": 1,
+                    "volume": 1,
+                    "pitch_shift": 0.5,
+                    "pitch_scale": 0.5,
+                    "speaker_id": "ar-female-Nadia-saudi-neutral",
+                    "language_id": "ar"
+                },
+                "status": "Completed",
+                "audioDuration": 2
+            },
+            {
+                "timestamp": 1701326972188,
+                "jobId": "567c720a-37c5-4132-bc10-647207d8e1ad",
+                "text": "hello how are you",
+                "params": {
+                    "pace": 1,
+                    "volume": 1,
+                    "pitch_shift": 0.5,
+                    "pitch_scale": 0.5,
+                    "speaker_id": "ar-female-Nadia-saudi-neutral",
+                    "language_id": "ar"
+                },
+                "status": "Completed",
+                "audioDuration": 2
+            }
+            ...
+        ],
+        "total": 27,
+        "pageSize": 10,
+        "page": 2
+    }
+}
+```
 
 ## More Features
 
@@ -261,8 +419,14 @@ langs = vai.languages('file')
 langs = vai.languages('stream')
 ```
 
+#### List voices
+To get the list of supported voices along with its metadata, use:
+```python
+voices = vai.voices()
+```
+
 #### Job Config
-Instead of providing config as a `dict`, you can provide it as a `str`, `pathlib.Path` or a file-like object.  
+Instead of providing any config or params as a `dict`, you can provide it as a `str`, `pathlib.Path` or a file-like object.  
 ```python
 job_id = vai.transcribe(
     file='path/to/audio.wav',
