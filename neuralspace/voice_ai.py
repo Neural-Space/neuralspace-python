@@ -277,9 +277,9 @@ class VoiceAI:
         Parameters
         ----------
         job_id: str
-            The job ID for the AMA session.
+            The job ID for the transcript on which to run AMA.
         prompts: List[str]
-            List of prompts for the AMA session.
+            List of prompts for the AMA.
 
         Returns
         -------

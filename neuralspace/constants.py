@@ -14,7 +14,7 @@ JOBS_URL = 'api/v2/jobs'
 if env.JOBS_URL is not None:
     JOBS_URL = env.JOBS_URL
 
-TTS_URL = 'api/v1/tts'
+TTS_URL = 'api/v2/tts'
 if env.TTS_URL is not None:
     TTS_URL = env.TTS_URL
 
