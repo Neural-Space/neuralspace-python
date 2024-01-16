@@ -394,3 +394,97 @@ class VoiceAI:
         sess = self._get_session()
         r = sess.delete(url, headers=hdrs)
         return utils.get_json_resp(r)
+
+    def create_custom_dict(self, name: str, words: List[str]) -> Dict[str, Any]:
+        '''
+        Create a dictionary of custom words for vocab adaptation.
+
+        Parameters
+        ----------
+        name: str
+            Name of the custom dictionary
+        words: List[str]
+            List of words to be added to the custom dictionary
+
+        Returns
+        -------
+        result: dict
+            Contains the id of the newly created custom dictionary
+        '''
+        payload = json.dumps({
+            "name": name,
+            "words": words
+        })
+        sess = self._get_session()
+        headers = self._create_headers()
+        headers['Content-Type'] = 'application/json'
+        r = sess.post(K.FULL_VOCAB_ADAPT_URL, headers=headers, data=payload)
+        resp = utils.get_json_resp(r)
+        return resp
+
+    def get_custom_dicts(self) -> Dict[str, Any]:
+        '''
+        Fetch a list of all custom dictionaries created by the user.
+
+        Returns
+        -------
+            result: dict
+                Contains the list of custom dictionaries created by the user.
+        '''
+        sess = self._get_session()
+        headers = self._create_headers()
+        r = sess.get(K.FULL_VOCAB_ADAPT_URL, headers=headers)
+        resp = utils.get_json_resp(r)
+        return resp
+    
+    def get_custom_dict(self, dict_id: str) -> Dict[str, Any]:
+        '''
+        Fetch the details of a custom dictionary.
+
+        Parameters
+        ----------
+        dict_id: str
+            Id of the custom dictionary
+
+        Returns
+        -------
+            result: dict
+                Contains the details like id, name and words the the custom dictionary.
+        '''
+        sess = self._get_session()
+        headers = self._create_headers()
+        r = sess.get(f'{K.FULL_VOCAB_ADAPT_URL}/{dict_id}', headers=headers)
+        resp = utils.get_json_resp(r)
+        return resp
+    
+    def update_custom_dict(self, dict_id: str, op: str, words: List[str]) -> Dict[str, Any]:
+        '''
+        Update the words in custom dictionary.
+
+        Parameters
+        ----------
+        dict_id: str
+            Id of the custom dictionary
+
+        op: str
+            Operation to be performed on the custom dictionary.\n
+            `add` or (add more here)
+        
+        words: List[str]
+            List of words to be added to the custom dictionary
+
+        Returns
+        -------
+            result: dict
+                contains the message of the operation performed on the custom dictionary.
+        '''
+        payload = json.dumps({
+            "op": op,
+            "words": words
+        })
+        sess = self._get_session()
+        headers = self._create_headers()
+        headers['Content-Type'] = 'application/json'
+        r = sess.patch(f'{K.FULL_VOCAB_ADAPT_URL}/{dict_id}', headers=headers, data=payload)
+        resp = utils.get_json_resp(r)
+        return resp

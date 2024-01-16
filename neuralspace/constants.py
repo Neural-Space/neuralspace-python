@@ -34,6 +34,10 @@ TOKEN_URL = 'api/v2/token'
 if env.TOKEN_URL is not None:
     TOKEN_URL = env.TOKEN_URL
 
+VOCAB_ADAPT_URL = 'api/v2/dicts'
+if env.VOCAB_ADAPT_URL is not None:
+    VOCAB_ADAPT_URL = env.VOCAB_ADAPT_URL
+
 AMA_URL = 'api/v2/prompts'
 if env.AMA_URL is not None:
     AMA_URL = env.AMA_URL
@@ -47,6 +51,7 @@ FULL_VOICES_URL = f'{BASE_URL.rstrip("/")}/{VOICES_URL.strip("/")}'
 FULL_TOKEN_URL = f'{BASE_URL.rstrip("/")}/{TOKEN_URL.strip("/")}'
 FULL_AMA_URL = f'{BASE_URL.rstrip("/")}/{AMA_URL.strip("/")}'
 FULL_TTS_URL = f'{BASE_URL.rstrip("/")}/{TTS_URL.strip("/")}'
+FULL_VOCAB_ADAPT_URL = f'{BASE_URL.rstrip("/")}/{VOCAB_ADAPT_URL.strip("/")}'
 
 
 # literals
