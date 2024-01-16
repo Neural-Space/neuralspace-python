@@ -270,6 +270,36 @@ class VoiceAI:
         return result
 
 
+    def ama(self, job_id: str, prompts: List[str]) -> Dict[str, Any]:
+        """
+        Create and send a request for an AMA job.
+
+        Parameters
+        ----------
+        job_id: str
+            The job ID for the transcript on which to run AMA.
+        prompts: List[str]
+            List of prompts for the AMA.
+
+        Returns
+        -------
+        result: dict
+            The response from the server.
+        """
+        url = f'{K.FULL_AMA_URL.rstrip("/")}'
+        hdrs = self._create_headers()
+        hdrs['Content-Type'] = 'application/json'
+        data = json.dumps({
+            "jobId": job_id,
+            "prompts": prompts
+        })
+
+        sess = self._get_session()
+        r = sess.post(url, headers=hdrs, data=data)
+        resp = utils.get_json_resp(r)
+        return resp
+
+
     def _get_short_lived_token(self, timeout):
         url = f'{K.FULL_TOKEN_URL}?duration={timeout}'
         hdrs = self._create_headers()
