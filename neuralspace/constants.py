@@ -10,11 +10,11 @@ BASE_URL = 'https://voice.neuralspace.ai'
 if env.BASE_URL is not None:
     BASE_URL = env.BASE_URL
 
-JOBS_URL = 'api/v1/jobs'
+JOBS_URL = 'api/v2/jobs'
 if env.JOBS_URL is not None:
     JOBS_URL = env.JOBS_URL
 
-TTS_URL = 'api/v1/tts'
+TTS_URL = 'api/v2/tts'
 if env.TTS_URL is not None:
     TTS_URL = env.TTS_URL
 
@@ -22,18 +22,21 @@ STREAM_URL = 'voice/stream/live/transcribe'
 if env.STREAM_URL is not None:
     STREAM_URL = env.STREAM_URL
 
-LANGS_URL = 'api/v1/languages'
+LANGS_URL = 'api/v2/languages'
 if env.LANGS_URL is not None:
     LANGS_URL = env.LANGS_URL
 
-VOICES_URL = 'api/v1/tts/voices'
+VOICES_URL = 'api/v2/tts/voices'
 if env.VOICES_URL is not None:
     VOICES_URL = env.VOICES_URL
 
-TOKEN_URL = 'api/v1/token'
+TOKEN_URL = 'api/v2/token'
 if env.TOKEN_URL is not None:
     TOKEN_URL = env.TOKEN_URL
 
+AMA_URL = 'api/v2/prompts'
+if env.AMA_URL is not None:
+    AMA_URL = env.AMA_URL
 
 # full url formation
 
@@ -42,6 +45,7 @@ FULL_STREAM_URL = f'{BASE_URL.replace("https://", "wss://").rstrip("/")}/{STREAM
 FULL_LANGS_URL = f'{BASE_URL.rstrip("/")}/{LANGS_URL.strip("/")}'
 FULL_VOICES_URL = f'{BASE_URL.rstrip("/")}/{VOICES_URL.strip("/")}'
 FULL_TOKEN_URL = f'{BASE_URL.rstrip("/")}/{TOKEN_URL.strip("/")}'
+FULL_AMA_URL = f'{BASE_URL.rstrip("/")}/{AMA_URL.strip("/")}'
 FULL_TTS_URL = f'{BASE_URL.rstrip("/")}/{TTS_URL.strip("/")}'
 
 
