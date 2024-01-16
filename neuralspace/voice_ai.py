@@ -288,14 +288,14 @@ class VoiceAI:
         """
         url = f'{K.FULL_AMA_URL.rstrip("/")}'
         hdrs = self._create_headers()
-        hdrs['Content-Type'] = 'application/json'
-        data = json.dumps({
+
+        data = {
             "jobId": job_id,
             "prompts": prompts
-        })
+        }
 
         sess = self._get_session()
-        r = sess.post(url, headers=hdrs, data=data)
+        r = sess.post(url, headers=hdrs, json=data)
         resp = utils.get_json_resp(r)
         return resp
 
@@ -411,14 +411,13 @@ class VoiceAI:
         result: dict
             Contains the id of the newly created custom dictionary
         '''
-        payload = json.dumps({
-            "name": name,
-            "words": words
-        })
         sess = self._get_session()
         headers = self._create_headers()
-        headers['Content-Type'] = 'application/json'
-        r = sess.post(K.FULL_VOCAB_ADAPT_URL, headers=headers, data=payload)
+        data = {
+            "name": name,
+            "words": words
+        }
+        r = sess.post(K.FULL_VOCAB_ADAPT_URL, headers=headers, json=data)
         resp = utils.get_json_resp(r)
         return resp
 
@@ -478,13 +477,12 @@ class VoiceAI:
             result: dict
                 contains the message of the operation performed on the custom dictionary.
         '''
-        payload = json.dumps({
-            "op": op,
-            "words": words
-        })
         sess = self._get_session()
         headers = self._create_headers()
-        headers['Content-Type'] = 'application/json'
-        r = sess.patch(f'{K.FULL_VOCAB_ADAPT_URL}/{dict_id}', headers=headers, data=payload)
+        data = {
+            "op": op,
+            "words": words
+        }
+        r = sess.patch(f'{K.FULL_VOCAB_ADAPT_URL}/{dict_id}', headers=headers, json=data)
         resp = utils.get_json_resp(r)
         return resp
