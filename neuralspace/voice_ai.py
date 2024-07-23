@@ -145,7 +145,8 @@ class VoiceAI:
                vad_min_silence: Optional[float] = 0.1,
                disable_partial: Optional[bool] = False,
                audio_format: Optional[str] = 'pcm_16k',
-               timeout: Optional[float] = None) -> websocket.WebSocket:
+               timeout: Optional[float] = None,
+               noise_level: Optional[float] = 0.0) -> websocket.WebSocket:
         '''
         Streaming real-time transcription.\n
         Context manager that returns a websocket connection.
@@ -179,7 +180,7 @@ class VoiceAI:
         if timeout is None:
             timeout = K.timeout
         token = self._get_short_lived_token(timeout)
-        url = f'{K.FULL_STREAM_URL}/{language_id}/{token}/{uuid4()}?min_chunk_size={min_chunk_size}&max_chunk_size={max_chunk_size}&vad_threshold={vad_threshold}&vad_min_silence={vad_min_silence}&disable_partial={disable_partial}&format={audio_format}'
+        url = f'{K.FULL_STREAM_URL}/{language_id}/{token}/{uuid4()}?min_chunk_size={min_chunk_size}&max_chunk_size={max_chunk_size}&vad_threshold={vad_threshold}&vad_min_silence={vad_min_silence}&disable_partial={disable_partial}&format={audio_format}&noise_level={noise_level}'
         ws = websocket.WebSocket()
         ws.connect(url, timeout=timeout)
         try:
